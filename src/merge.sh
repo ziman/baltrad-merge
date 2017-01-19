@@ -1,14 +1,27 @@
 #!/bin/bash
 
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/radar/lib:/opt/radar/rave/lib:/opt/radar/rsl/lib:/opt/radar/vol2bird/lib:/usr/lib/x86_64-linux-gnu
-export PATH=${PATH}:/opt/radar/vol2bird/bin:/opt/radar/baltrad-merge
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/lib"
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/rave/lib"
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/rave/Lib"
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/rsl/lib"
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/vol2bird/lib"
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/lib/x86_64-linux-gnu"
+export LD_LIBRARY_PATH
 
+PATH="${PATH}:/opt/radar/vol2bird/bin"
+PATH="${PATH}:/opt/radar/baltrad-merge"
+export PATH
+
+PYTHONPATH="${PYTHONPATH}:/opt/radar/vol2bird/share/vol2bird"
+PYTHONPATH="${PYTHONPATH}:/opt/radar/vol2bird/share/vol2bird/pyvol2bird"
+PYTHONPATH="${PYTHONPATH}:/opt/radar/rave/Lib"
+export PYTHONPATH
 
 # 525600 minutes = 1 year
 exec /opt/radar/baltrad-merge/generate_profiles.py \
     --merge-files /opt/radar/rave/bin/merge_files \
     --scans2pvol /opt/radar/baltrad-merge/Scans2Pvol.py \
-    --vol2bird /optc/radar/vol2bird/bin/vol2bird \
+    --vol2bird /opt/radar/vol2bird/bin/vol2bird \
     --age-limit 525600 \
     -i "${1:-/data/in}" \
     -o "${2:-/data/out}" \

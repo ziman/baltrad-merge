@@ -44,8 +44,8 @@ RUN git clone https://github.com/adokter/vol2bird.git \
 RUN git clone https://github.com/ziman/baltrad-merge \
     && mkdir -p /opt/radar/baltrad-merge \
     && cp \
-        baltrad-merge/src/Scans2Pvol.py \
         baltrad-merge/src/generate_profiles.py \
+        baltrad-merge/src/Scans2Pvol.py \
         baltrad-merge/src/merge.sh \
         /opt/radar/baltrad-merge \
     && rm -rf baltrad-merge
