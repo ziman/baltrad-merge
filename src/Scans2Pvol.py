@@ -29,7 +29,6 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 import sys, os, glob, time
 import _raveio, _polarvolume
 import odim_source
-import odc_filesys
 import polar_merger
 from Proj import rd
 
@@ -151,7 +150,7 @@ def generate(args):
 
         rio = _raveio.new()
         rio.object = pvol
-        rio.filename = odc_filesys.MakePolarFileName(rio)
+        rio.filename = 'polar_filename.h5'
         rio.save()
     return rio.filename  # Only really useful with data from one radar
 
@@ -161,13 +160,10 @@ def generate(args):
 def multi_generate(seconds=None):
     import datetime
     import multiprocessing
-    pool = multiprocessing.Pool(8)
 
-    if seconds == None:
-        seconds = odc_filesys.GetSeconds() - odc_filesys.ACQ_DELAY
-    tt = time.localtime(seconds)
-    #tt = datetime.datetime.strptime("20161018030000","%Y%m%d%H%M%S").timetuple()
-    path = odc_filesys.GetPathFromTuple(tt)
+    pool = multiprocessing.Pool(8)
+    seconds = 0
+    path = '.'
 
     files = glob.glob(os.path.join(path, '*scan*.h5'))
     nodes, args = [], []

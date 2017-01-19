@@ -48,7 +48,8 @@ RUN git clone https://github.com/ziman/baltrad-merge \
         baltrad-merge/src/Scans2Pvol.py \
         baltrad-merge/src/merge.sh \
         /opt/radar/baltrad-merge \
-    && rm -rf baltrad-merge
+    && rm -rf baltrad-merge \
+    && : cache-invalidation-002
 
 # clean up
 # what we need to stay: numpy, python
