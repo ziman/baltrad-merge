@@ -168,12 +168,14 @@ def multi_generate(seconds=None):
     files = glob.glob(os.path.join(path, '*scan*.h5'))
     nodes, args = [], []
     for fstr in files:
+        print('FSTR',fstr)
         node = os.path.split(fstr)[1][:5]
         if node not in nodes:
             nodes.append(node)
             nodefiles = glob.glob(os.path.join(path, node+'*scan*.h5'))
             args.append((seconds,nodefiles))
 
+    print('ARGS', args)
     results = []
     r = pool.map_async(generate, args, chunksize=1, callback=results.append)
     r.wait() # Wait on the results
