@@ -5,8 +5,16 @@ if [ -z "$3" ]; then
     exit 1
 fi
 
+dir_in="$(realpath "$1")"
+dir_out="$(realpath "$2")"
+dir_work="$(realpath "$3")"
+shift
+shift
+shift
+
 docker run \
-    -v "$1":"/data/in" \
-    -v "$2":"/data/out" \
-    -v "$3":"/data/work" \
-    ziman/baltrad-merge
+    -v "$dir_in":"/data/in" \
+    -v "$dir_out":"/data/out" \
+    -v "$dir_work":"/data/work" \
+    ziman/baltrad-merge \
+    "$@"
