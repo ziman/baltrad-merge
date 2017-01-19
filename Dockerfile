@@ -1,21 +1,18 @@
 FROM adokter/vol2bird
 MAINTAINER Matus Tejiscak
 
-RUN apt-get update && apt-get install -y git python python-pip
+RUN apt-get update && apt-get install -y git python
 
 RUN git clone https://github.com/ziman/baltrad-merge \
     && mkdir -p /opt/radar/baltrad-merge \
     && cp \
-        baltrad-merge/generate_profiles.py \
-        baltrad-merge/Scans2Pvol.py \
-        baltrad-merge/merge.sh \
+        baltrad-merge/src/generate_profiles.py \
+        baltrad-merge/src/Scans2Pvol.py \
         /opt/radar/baltrad-merge \
     && rm -rf baltrad-merge
 
-#RUN apt-get remove -y git \
-#    && apt-get clean && apt -y autoremove && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-ENV PATH=${PATH}:/opt/radar/baltrad-merge
+RUN apt-get remove -y git \
+    && apt-get clean && apt -y autoremove && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 CMD /opt/radar/baltrad-merge/generate_profiles.py \
     --merge-files /opt/radar/rave/bin/merge_files \
