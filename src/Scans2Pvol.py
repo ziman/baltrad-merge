@@ -30,8 +30,11 @@ import sys, os, glob, time
 import _raveio, _polarvolume
 import odim_source
 import polar_merger
+import logging
 from Proj import rd
 
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
 # @param ts string of format YYYYMMDDHHmm
 # @returns float seconds since epoch to be used with time.localtime
@@ -53,8 +56,6 @@ def GetTime(ts):
 # @param args tuple containing the nominal time (in seconds past epoch) and
 # a list of file strings containing input data.
 def generate(args):
-    import rave_pgf_logger
-    logger = rave_pgf_logger.rave_pgf_syslog_client()
     seconds, files = args
     ndt = None
     master = {}
@@ -64,7 +65,7 @@ def generate(args):
         try:
           obj = _raveio.open(fstr).object
         except Exception, e:
-          logger.exception("Failed to open file %s"%fstr)
+          log.exception("Failed to open file %s"%fstr)
           continue
 
         src = odim_source.ODIM_Source(obj.source)
@@ -168,24 +169,14 @@ def multi_generate(seconds=None):
     files = glob.glob(os.path.join(path, '*scan*.h5'))
     nodes, args = [], []
     for fstr in files:
-        print('FSTR',fstr)
         node = os.path.split(fstr)[1][:5]
         if node not in nodes:
             nodes.append(node)
             nodefiles = glob.glob(os.path.join(path, node+'*scan*.h5'))
             args.append((seconds,nodefiles))
 
-    print('ARGS', args)
-    results = []
-    r = pool.map_async(generate, args, chunksize=1, callback=results.append)
-    r.wait() # Wait on the results
-#    for i in range(len(results[0])):
-#        print nodes[i], results[0][i]
+    results = [generate(arg) for arg in args]
     return len(files), results[0]
 
-
 if __name__ == "__main__":
-    done = multi_generate()
-
-
-
+    multi_generate()
