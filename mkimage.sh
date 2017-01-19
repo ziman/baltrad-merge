@@ -15,5 +15,5 @@ docker export $container_id \
         /dev/stdin \
         ziman/baltrad-merge
 
-docker stop baltrad-merge-uncompacted
-docker rm baltrad-merge-uncompacted
+docker stop $container_id
+docker rm $container_id
