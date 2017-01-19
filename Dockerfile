@@ -51,7 +51,8 @@ RUN git clone https://github.com/ziman/baltrad-merge \
     && rm -rf baltrad-merge
 
 # clean up
-RUN apt-get remove -y git gcc make python-numpy -y python-dev flex \
+# what we need to stay: numpy, python
+RUN apt-get remove -y git gcc make -y python-dev flex \
     && apt-get clean && apt -y autoremove && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 CMD /opt/radar/baltrad-merge/merge.sh
