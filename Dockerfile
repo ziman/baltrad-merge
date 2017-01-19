@@ -41,10 +41,6 @@ RUN git clone https://github.com/adokter/vol2bird.git \
         --with-gsl=/usr/include/gsl,/usr/lib/x86_64-linux-gnu \
     && make && make install && cd .. && rm -rf vol2bird
 
-# clean up
-RUN apt-get remove -y git gcc make python-numpy -y python-dev flex \
-    && apt-get clean && apt -y autoremove && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 RUN git clone https://github.com/ziman/baltrad-merge \
     && mkdir -p /opt/radar/baltrad-merge \
     && cp \
@@ -54,7 +50,8 @@ RUN git clone https://github.com/ziman/baltrad-merge \
         /opt/radar/baltrad-merge \
     && rm -rf baltrad-merge
 
-RUN apt-get remove -y git \
+# clean up
+RUN apt-get remove -y git gcc make python-numpy -y python-dev flex \
     && apt-get clean && apt -y autoremove && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/radar/lib:/opt/radar/rave/lib:/opt/radar/rsl/lib:/opt/radar/vol2bird/lib:/usr/lib/x86_64-linux-gnu
