@@ -44,8 +44,8 @@ RUN git clone https://github.com/adokter/vol2bird.git \
 RUN git clone https://github.com/ziman/baltrad-merge \
     && mkdir -p /opt/radar/baltrad-merge \
     && cp \
-        baltrad-merge/src/generate_profiles.py \
         baltrad-merge/src/Scans2Pvol.py \
+        baltrad-merge/src/generate_profiles.py \
         baltrad-merge/src/merge.sh \
         /opt/radar/baltrad-merge \
     && rm -rf baltrad-merge
@@ -54,7 +54,4 @@ RUN git clone https://github.com/ziman/baltrad-merge \
 RUN apt-get remove -y git gcc make python-numpy -y python-dev flex \
     && apt-get clean && apt -y autoremove && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/radar/lib:/opt/radar/rave/lib:/opt/radar/rsl/lib:/opt/radar/vol2bird/lib:/usr/lib/x86_64-linux-gnu
-ENV PATH=${PATH}:/opt/radar/vol2bird/bin:/opt/radar/baltrad-merge
-
-CMD merge.sh
+CMD /opt/radar/baltrad-merge/merge.sh

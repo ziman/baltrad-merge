@@ -11,7 +11,7 @@ container_id=$(docker run -d baltrad-merge-uncompacted /bin/bash)
 # the default command CMD needs to be put back in
 docker export $container_id \
     | docker import \
-        --change='CMD merge.sh' \
+        --change='CMD /opt/radar/baltrad-merge/merge.sh' \
         /dev/stdin \
         ziman/baltrad-merge
 
