@@ -41,19 +41,12 @@ RUN git clone https://github.com/adokter/vol2bird.git \
         --with-gsl=/usr/include/gsl,/usr/lib/x86_64-linux-gnu \
     && make && make install && cd .. && rm -rf vol2bird
 
-RUN git clone https://github.com/ziman/baltrad-merge \
-    && mkdir -p /opt/radar/baltrad-merge \
-    && cp \
-        baltrad-merge/src/generate_profiles.py \
-        baltrad-merge/src/Scans2Pvol.py \
-        baltrad-merge/src/merge.sh \
-        /opt/radar/baltrad-merge \
-    && rm -rf baltrad-merge \
-    && : cache-invalidation-003
-
 # clean up
-# what we need to stay: numpy, python
+# what needs to stay: numpy, python
 RUN apt-get remove -y git gcc make -y python-dev flex \
     && apt-get clean && apt -y autoremove && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN mkdir -p /opt/radar/baltrad-merge
+COPY src/* /opt/radar/baltrad-merge/
 
 CMD /opt/radar/baltrad-merge/merge.sh
