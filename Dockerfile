@@ -1,4 +1,6 @@
-FROM adokter/vol2bird
+# my build from January 2017 contains some fresh improvements
+# that have been merged into master but not pushed to docker yet
+FROM ziman/vol2bird:jan2017
 MAINTAINER Matus Tejiscak
 
 RUN apt-get update && apt-get install -y git python
