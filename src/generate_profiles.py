@@ -126,9 +126,14 @@ def merge_volumes(args, files, fname_out):
     # we (arbitrarily) select the first polar volume in each group for merging
     merge_inputs = [min(files, key=lambda f: f.ts_extra) for files in by_quantity.itervalues()]
 
-    if len(merge_inputs) <= 1:
-        log.debug('nothing to merge')
+    if len(merge_inputs) == 1:
+        info = merge_inputs[0]
+        log.info('singleton group, just copying file: ' + info.path)
+        shutil.copy(info.path, fname_out)
         return
+
+    # there should be no empty datasets after this point
+    assert merge_inputs
 
     # create temporary dirs
     dir_src, dir_dst = mktmp_linked(args, 'merge', merge_inputs)
