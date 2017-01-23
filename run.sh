@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# mac os x doesn't have a native realpath(1)
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
 if [ -z "$3" ]; then
     echo "usage: $0 INPUT_DIR OUTPUT_DIR WORK_DIR" >&2
     exit 1
