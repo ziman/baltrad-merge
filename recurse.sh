@@ -20,7 +20,7 @@ recurse() {
     fi
 
     for subdir in */; do
-        if [ -d "$subdir" ]; then
+        if [ -d "$dir_in/$subdir" ]; then
             recurse "$run_sh" "$dir_in/$subdir" "$dir_out/$subdir" "$dir_work"
         fi
     done
