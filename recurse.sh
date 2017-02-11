@@ -6,10 +6,10 @@ realpath() {
 }
 
 recurse() {
-    run_sh="$1"
-    dir_in="$2"
-    dir_out="$3"
-    dir_work="$4"
+    local run_sh="$1"
+    local dir_in="$2"
+    local dir_out="$3"
+    local dir_work="$4"
 
     cd "$dir_in"
     echo "* $dir_in"
