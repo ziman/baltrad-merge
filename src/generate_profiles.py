@@ -218,7 +218,11 @@ def process_files(args, files):
     for info in files:
         grouped[(info.radar, info.ts)].append(info)
 
-    dirname_merged = pjoin(args.dirname_work, 'merged')
+    if args.keep_merged:
+        dirname_merged = pjoin(args.dirname_out, 'merged')
+    else:
+        dirname_merged = pjoin(args.dirname_work, 'merged')
+
     if not os.path.exists(dirname_merged):
         os.makedirs(dirname_merged)
 
@@ -323,6 +327,8 @@ if __name__ == '__main__':
         help='path to Scans2Pvol.py')
     ap.add_argument('--vol2bird', default='vol2bird', metavar='PATH',
         help='path to vol2bird')
+    ap.add_argument('--keep-merged', default=False, action='store_true',
+        help='add merged files (input to vol2bird) to the output directory')
 
     rn = ap.add_argument_group('required named arguments')
     rn.add_argument('-i', dest='dirname_in', required=True, metavar='PATH',
