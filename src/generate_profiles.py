@@ -150,7 +150,7 @@ def merge_volumes(args, files, fname_out):
 
         # move the result out
         for fname in os.listdir(dir_dst):
-            os.rename(
+            shutil.move(
                 pjoin(dir_dst, fname),
                 fname_out
             )
@@ -178,7 +178,7 @@ def merge_scans(args, files, fname_out):
             if fname in files_before:
                 continue
 
-            os.rename(fname, fname_out_abs)
+            shutil.move(fname, fname_out_abs)
     except subprocess.CalledProcessError as e:
         log.warn('scans2pvol failed: %s' % e)
     finally:
