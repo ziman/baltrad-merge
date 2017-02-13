@@ -1,6 +1,5 @@
 #!/bin/bash
 
-uid_no="$1"
 dir_in="$2"
 dir_out="$3"
 dir_work="$4"
@@ -26,8 +25,7 @@ PYTHONPATH="${PYTHONPATH}:/opt/radar/rave/Lib"
 export PYTHONPATH
 
 # 525600 minutes = 1 year
-exec sudo -u "#$uid_no" \
-    /opt/radar/baltrad-merge/generate_profiles.py \
+exec /opt/radar/baltrad-merge/generate_profiles.py \
     --merge-files /opt/radar/rave/bin/merge_files \
     --scans2pvol /opt/radar/baltrad-merge/Scans2Pvol.py \
     --vol2bird /opt/radar/vol2bird/bin/vol2bird \
