@@ -4,9 +4,6 @@ dir_in="$2"
 dir_out="$3"
 dir_work="$4"
 
-# let's see if we can get away without this
-#useradd -u "$uid_no" "baltrad"
-
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/lib"
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/rave/lib"
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/rave/Lib"
