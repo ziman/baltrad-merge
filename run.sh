@@ -10,11 +10,16 @@ if [ -z "$3" ]; then
     exit 1
 fi
 
+uid_no="$1"
+shift
+
 dir_in="$(realpath "$1")"
-dir_out="$(realpath "$2")"
-dir_work="$(realpath "$3")"
 shift
+
+dir_out="$(realpath "$1")"
 shift
+
+dir_work="$(realpath "$1")"
 shift
 
 docker run \
@@ -22,4 +27,5 @@ docker run \
     -v "$dir_out":"/data/out" \
     -v "$dir_work":"/data/work" \
     ziman/baltrad-merge \
+    "$uid_no" \
     "$@"
