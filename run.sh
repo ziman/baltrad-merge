@@ -19,12 +19,12 @@ shift
 dir_work="$(realpath "$1")"
 shift
 
-uid="$(id -u)"
-
 docker run \
-    -u "$uid" \
+    -u "$(id -u)" \
     -v "$dir_in":"/data/in" \
     -v "$dir_out":"/data/out" \
     -v "$dir_work":"/data/work" \
     ziman/baltrad-merge \
     "$@"
+
+# vim: ts=4 sts=4 sw=4 et
