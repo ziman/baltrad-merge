@@ -1,5 +1,9 @@
 #!/bin/bash
 
+dir_in="$2"
+dir_out="$3"
+dir_work="$4"
+
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/lib"
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/rave/lib"
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/radar/rave/Lib"
@@ -23,6 +27,8 @@ exec /opt/radar/baltrad-merge/generate_profiles.py \
     --scans2pvol /opt/radar/baltrad-merge/Scans2Pvol.py \
     --vol2bird /opt/radar/vol2bird/bin/vol2bird \
     --age-limit 525600 \
-    -i "${1:-/data/in}" \
-    -o "${2:-/data/out}" \
-    -w "${3:-/data/work}"
+    -i "${dir_in:-/data/in}" \
+    -o "${dir_out:-/data/out}" \
+    -w "${dir_work:-/data/work}"
+
+# vim: ts=4 sts=4 sw=4 et

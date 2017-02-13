@@ -11,13 +11,18 @@ if [ -z "$3" ]; then
 fi
 
 dir_in="$(realpath "$1")"
-dir_out="$(realpath "$2")"
-dir_work="$(realpath "$3")"
-shift
-shift
 shift
 
+dir_out="$(realpath "$1")"
+shift
+
+dir_work="$(realpath "$1")"
+shift
+
+uid="$(id -u)"
+
 docker run \
+    -u "$uid" \
     -v "$dir_in":"/data/in" \
     -v "$dir_out":"/data/out" \
     -v "$dir_work":"/data/work" \
