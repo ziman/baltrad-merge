@@ -18,6 +18,7 @@ shift
 shift
 
 docker run \
+    --rm \
     -u "$(id -u)" \
     -v "$dir_in":"/data/in" \
     -v "$dir_out":"/data/out" \
