@@ -17,6 +17,9 @@ PYTHONPATH="${PYTHONPATH}:/opt/radar/vol2bird/share/vol2bird/pyvol2bird"
 PYTHONPATH="${PYTHONPATH}:/opt/radar/rave/Lib"
 export PYTHONPATH
 
+# move into the directory with options.conf
+cd /data/etc
+
 # 525600 minutes = 1 year
 exec /opt/radar/baltrad-merge/generate_profiles.py \
     --merge-files /opt/radar/rave/bin/merge_files \

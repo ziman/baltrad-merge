@@ -17,11 +17,14 @@ shift
 shift
 shift
 
+dir_etc="$(dirname "$(realpath "$0")")"
+
 docker run \
     --rm \
     -u "$(id -u)" \
     -v "$dir_in":"/data/in" \
     -v "$dir_out":"/data/out" \
     -v "$dir_work":"/data/work" \
+    -v "$dir_etc":"/data/etc" \
     ziman/baltrad-merge \
     "$@"
