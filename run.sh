@@ -17,7 +17,7 @@ shift
 shift
 shift
 
-dir_etc="$(dirname "$(realpath "$0")")"
+dir_etc="$(dirname "$(realpath "$0")")/etc"
 
 docker run \
     --rm \

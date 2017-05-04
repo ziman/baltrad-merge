@@ -302,6 +302,15 @@ def main(args):
 
         files_in.append(info)
 
+    # first, filter out the radar in question
+    if args.radar:
+        files_in = [
+            info
+            for info in files_in
+            if info.radar.startswith(args.radar)
+        ]
+
+    # then filter dates
     if args.date_from or args.date_to:
         DATE_FMT = '%Y/%m/%d'
         date_from = args.date_from and datetime.datetime.strptime(args.date_from, DATE_FMT)
@@ -313,7 +322,6 @@ def main(args):
             if
                 ((date_from is None) or (info.ts >= date_from))
                 and ((date_to is None) or (info.ts <= date_to))
-                and ((args.radar is None) or (info.radar.startswith(args.radar)))
         ]
 
     elif args.age_limit:
@@ -327,8 +335,8 @@ def main(args):
             and is_raw_data(info)
         ]
 
+    # if anything's left, run processing
     if files_in:
-        # if any files left after filtering
         if not os.path.exists(args.dirname_work):
             os.makedirs(args.dirname_work)
 
