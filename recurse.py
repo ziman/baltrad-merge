@@ -32,6 +32,12 @@ def recurse(args, dir_in, dir_out):
     if args.radar:
         cmd += ['--input-filter', args.radar]
 
+    if args.date_from:
+        cmd += ['--date-from', args.date_from]
+
+    if args.date_to:
+        cmd += ['--date-to', args.date_to]
+
     if args.dry_run:
         log.info(' '.join(cmd))
     else:

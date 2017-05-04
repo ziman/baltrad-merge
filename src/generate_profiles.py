@@ -310,24 +310,41 @@ def main(args):
 
         files_in.append(info)
 
-    # filter out files that are too old
-    thresh = datetime.datetime.now() - datetime.timedelta(minutes=args.age_limit)
-    files_in = [
-        info
-        for info in files_in
-        if info.ts >= thresh    # recent enough
-           and is_raw_data(info)
-    ]
+    if args.date_from or args.date_to:
+        DATE_FMT = '%Y/%m/%d'
+        date_from = args.date_from and datetime.datetime.strptime(args.date_from, DATE_FMT)
+        date_to   = args.date_to   and datetime.datetime.strptime(args.date_from, DATE_FMT)
 
-    if not os.path.exists(args.dirname_work):
-        os.makedirs(args.dirname_work)
+        files_in = [
+            info
+            for info in files_in
+            if
+                (date_from is None or info.ts >= date_from)
+                and (date_to is None or info.ts >= date_to)
+        ]
 
-    process_files(args, files_in)
+    elif args.age_limit:
+        # apply generic age limit
+        # filter out files that are too old
+        thresh = datetime.datetime.now() - datetime.timedelta(minutes=args.age_limit)
+        files_in = [
+            info
+            for info in files_in
+            if info.ts >= thresh    # recent enough
+            and is_raw_data(info)
+        ]
+
+    if files_in:
+        # if any files left after filtering
+        if not os.path.exists(args.dirname_work):
+            os.makedirs(args.dirname_work)
+
+        process_files(args, files_in)
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
 
-    ap.add_argument('-a', '--age-limit', type=int, default=60, metavar='MINUTES',
+    ap.add_argument('-a', '--age-limit', type=int, metavar='MINUTES',
         help='skip files older than MINUTES ago [%(default)s min]')
     ap.add_argument('--merge-files', default='merge_files', metavar='PATH',
         help='path to merge_files')
@@ -349,5 +366,9 @@ if __name__ == '__main__':
     rn = ap.add_argument_group('optional arguments')
     rn.add_argument('--input-filter', dest='input_filter', metavar='REGEX',
         help='if specified, process only files with matching basename')
+    rn.add_argument('--date-from', metavar='YYYY/MM/DD',
+        help='skip files older than this (overrides --age-limit)')
+    rn.add_argument('--date-to', metavar='YYYY/MM/DD',
+        help='skip files newer than this (overrides --age-limit)')
 
     main(ap.parse_args())
