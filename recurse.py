@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 import os
 import logging
@@ -11,15 +11,20 @@ log = logging.getLogger(__name__)
 
 def recurse(args, dir_in, dir_out):
     log.info(dir_in)
-    os.makedirs(dir_out, exist_ok=True)
+
+    try:
+        os.makedirs(dir_out)
+    except OSError:
+        pass  # the dir probably just exists
 
     h5_files_present = False
-    for entry in os.scandir(dir_in):
-        if entry.is_dir():
-            recurse(args, pjoin(dir_in, entry.name), pjoin(dir_out, entry.name))
+    for fname in os.listdir(dir_in):
+        fname_full = pjoin(dir_in, fname)
+        if os.path.isdir(fname_full):
+            recurse(args, fname_full, pjoin(dir_out, entry.name))
             continue
 
-        if entry.name.endswith('.h5'):
+        if fname.endswith('.h5'):
             h5_files_present = True
 
     if not h5_files_present:
