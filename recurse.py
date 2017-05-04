@@ -19,9 +19,9 @@ def recurse(args, dir_in, dir_out):
 
     h5_files_present = False
     for fname in os.listdir(dir_in):
-        fname_full = pjoin(dir_in, fname)
-        if os.path.isdir(fname_full):
-            recurse(args, fname_full, pjoin(dir_out, entry.name))
+        fname_in = pjoin(dir_in, fname)
+        if os.path.isdir(fname_in):
+            recurse(args, fname_in, pjoin(dir_out, fname))
             continue
 
         if fname.endswith('.h5'):
