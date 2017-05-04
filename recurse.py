@@ -30,7 +30,7 @@ def recurse(args, dir_in, dir_out):
     # h5 files present -- run `run.sh`
     cmd = ['./run.sh', dir_in, dir_out, args.dir_work]
     if args.radar:
-        cmd += ['--input-filter', args.radar]
+        cmd += ['--radar', args.radar]
 
     if args.date_from:
         cmd += ['--date-from', args.date_from]
@@ -38,10 +38,7 @@ def recurse(args, dir_in, dir_out):
     if args.date_to:
         cmd += ['--date-to', args.date_to]
 
-    if args.dry_run:
-        log.info(' '.join(cmd))
-    else:
-        subprocess.check_call(cmd)
+    subprocess.check_call(cmd)
 
 def main(args):
     recurse(args, args.dir_in, args.dir_out)    
@@ -55,8 +52,5 @@ if __name__ == '__main__':
     ap.add_argument('--date-from', metavar="YYYY/MM/DD")
     ap.add_argument('--date-to', metavar="YYYY/MM/DD")
     ap.add_argument('--radar', metavar="CC|CCRRR", help="two- or five-letter radar code (2x country + 3x radar)")
-
-    ap.add_argument('--dry-run', default=False, action='store_true',
-        help="don't launch docker containers, just print the plan")
 
     main(ap.parse_args())

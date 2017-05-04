@@ -288,18 +288,11 @@ def is_raw_data(info):
         raise ProgramError('unknown file type "%s": %s' % (info.ftype, info.path))
 
 def main(args):
-    input_filter = None
-    if args.input_filter:
-        input_filter = re.compile(args.input_filter)
-
     files_in = []
     for fname in os.listdir(args.dirname_in):
         match = REGEX_FI.match(fname)
         if not match:
             log.warn('skipping unrecognised filename: ' + fname)
-            continue
-
-        if input_filter is not None and not input_filter.match(fname):
             continue
 
         info = parse_filename(
@@ -312,14 +305,15 @@ def main(args):
     if args.date_from or args.date_to:
         DATE_FMT = '%Y/%m/%d'
         date_from = args.date_from and datetime.datetime.strptime(args.date_from, DATE_FMT)
-        date_to   = args.date_to   and datetime.datetime.strptime(args.date_from, DATE_FMT)
+        date_to   = args.date_to   and datetime.datetime.strptime(args.date_to, DATE_FMT)
 
         files_in = [
             info
             for info in files_in
             if
-                (date_from is None or info.ts >= date_from)
-                and (date_to is None or info.ts <= date_to)
+                ((date_from is None) or (info.ts >= date_from))
+                and ((date_to is None) or (info.ts <= date_to))
+                and ((args.radar is None) or (info.radar.startswith(args.radar)))
         ]
 
     elif args.age_limit:
@@ -363,8 +357,8 @@ if __name__ == '__main__':
         help='directory for intermediate files')
 
     rn = ap.add_argument_group('optional arguments')
-    rn.add_argument('--input-filter', dest='input_filter', metavar='REGEX',
-        help='if specified, process only files with matching basename')
+    rn.add_argument('--radar', dest='radar', metavar='PREFIX',
+        help='if specified, process only files with matching prefix')
     rn.add_argument('--date-from', metavar='YYYY/MM/DD',
         help='skip files older than this (overrides --age-limit)')
     rn.add_argument('--date-to', metavar='YYYY/MM/DD',
