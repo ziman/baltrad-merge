@@ -300,7 +300,6 @@ def main(args):
             continue
 
         if input_filter is not None and not input_filter.match(fname):
-            log.info('filename does not match filter: ' + fname)
             continue
 
         info = parse_filename(
@@ -320,7 +319,7 @@ def main(args):
             for info in files_in
             if
                 (date_from is None or info.ts >= date_from)
-                and (date_to is None or info.ts >= date_to)
+                and (date_to is None or info.ts <= date_to)
         ]
 
     elif args.age_limit:
