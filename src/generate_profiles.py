@@ -288,11 +288,19 @@ def is_raw_data(info):
         raise ProgramError('unknown file type "%s": %s' % (info.ftype, info.path))
 
 def main(args):
+    input_filter = None
+    if args.input_filter:
+        input_filter = re.compile(args.input_filter)
+
     files_in = []
     for fname in os.listdir(args.dirname_in):
         match = REGEX_FI.match(fname)
         if not match:
             log.warn('skipping unrecognised filename: ' + fname)
+            continue
+
+        if input_filter is not None and not input_filter.match(fname):
+            log.info('filename does not match filter: ' + fname)
             continue
 
         info = parse_filename(
@@ -337,5 +345,9 @@ if __name__ == '__main__':
         help='directory to write bird profiles to')
     ap.add_argument('-w', dest='dirname_work', required=True, metavar='PATH',
         help='directory for intermediate files')
+
+    rn = ap.add_argument_group('optional arguments')
+    rn.add_argument('--input-filter', dest='input_filter', metavar='REGEX',
+        help='if specified, process only files with matching basename')
 
     main(ap.parse_args())

@@ -27,4 +27,6 @@ docker run \
     -v "$dir_work":"/data/work" \
     -v "$dir_etc":"/data/etc" \
     ziman/baltrad-merge \
-    "$@"
+    /opt/radar/baltrad-merge/merge.sh \
+        '/data/in' '/data/out' '/data/work' \
+        "$@"

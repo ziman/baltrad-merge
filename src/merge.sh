@@ -19,6 +19,11 @@ export PYTHONPATH
 
 export OPTIONS_CONF="/data/etc/options.conf"
 
+data_in="$1"
+data_out="$2"
+data_work="$3"
+shift; shift; shift
+
 # 525600 minutes = 1 year
 exec /opt/radar/baltrad-merge/generate_profiles.py \
     --merge-files /opt/radar/rave/bin/merge_files \
@@ -26,6 +31,7 @@ exec /opt/radar/baltrad-merge/generate_profiles.py \
     --vol2bird /opt/radar/vol2bird/bin/vol2bird \
     --age-limit 525600 \
     --keep-merged \
-    -i "${1:-/data/in}" \
-    -o "${2:-/data/out}" \
-    -w "${3:-/data/work}"
+    -i "$data_in" \
+    -o "$data_out" \
+    -w "$data_work" \
+    "$@"
