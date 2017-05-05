@@ -34,7 +34,6 @@ RUN git clone https://github.com/adokter/rsl.git && cd rsl \
 
 RUN git clone https://github.com/ziman/vol2bird.git \
     && cd vol2bird \
-    && git checkout opts-conf-env-dbg \
     && ./configure \
         --prefix=/opt/radar/vol2bird \
         --with-rave=/opt/radar/rave \
