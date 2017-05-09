@@ -32,7 +32,7 @@ RUN git clone https://github.com/adokter/rsl.git && cd rsl \
     && make install AUTOCONF=: AUTOHEADER=: AUTOMAKE=: ACLOCAL=: \
     && cd .. && rm -rf rsl
 
-RUN git clone https://github.com/ziman/vol2bird.git \
+RUN git clone https://github.com/adokter/vol2bird.git \
     && cd vol2bird \
     && ./configure \
         --prefix=/opt/radar/vol2bird \
