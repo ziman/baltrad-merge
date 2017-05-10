@@ -123,7 +123,7 @@ def merge_volumes(args, files, fname_out):
         by_quantity[info.quantities].append(info)
 
     # XXX TODO
-    # we (arbitrarily) select the first polar volume in each group for merging
+    # we (arbitrarily) select the first (= earliest by timestamp) polar volume in each group for merging
     merge_inputs = [min(files, key=lambda f: f.ts_extra) for files in by_quantity.itervalues()]
 
     if len(merge_inputs) == 1:
@@ -228,6 +228,12 @@ def process_files(args, files):
 
     pm = ProgressMeter(len(grouped))
     for (radar, ts), group_files in sorted(grouped.items(), key=lambda x: x[0]):
+
+        # output quantities are the union of all input quantities
+        quantities = 0x0
+        for info in group_files:
+            quantities |= info.quantities
+
         base_filename = lambda ftype: \
             make_filename(FileInfo(
                 path=None,
@@ -235,7 +241,7 @@ def process_files(args, files):
                 ftype=ftype,
                 angle=None,
                 ts=ts,
-                quantities=None,
+                quantities=quantities,
                 ts_extra=None,
             ))
 
@@ -255,7 +261,7 @@ def parse_filename(path, match):
         ftype=match.group(2),
         angle=match.group(3) and float(match.group(3)),
         ts=datetime.datetime.strptime(match.group(4), '%Y%m%dT%H%MZ'),
-        quantities=match.group(5),
+        quantities=match.group(5) and int(match.group(5), 16),
         ts_extra=match.group(6) and datetime.datetime.fromtimestamp(
             int(float(match.group(6)) / 100)
         ),
@@ -272,22 +278,51 @@ def make_filename(info):
     )
 
     if info.quantities:
-        fields.append(info.quantities)
+        fields.append('0x%x' % info.quantities)
 
     if info.ts_extra:
         fields.append('%s' % info.ts_extra.strftime('%s'))
 
     return '_'.join(fields) + '.h5'
 
-def is_raw_data(info):
-    if info.ftype == 'pvol':
-        return bool(info.quantities) and not bool(info.ts_extra)
-    elif info.ftype == 'scan':
-        return not bool(info.ts_extra)
-    else:
-        raise ProgramError('unknown file type "%s": %s' % (info.ftype, info.path))
+def should_process(args, info):
+    # missing quantities means that the file is Baltrad-merged
+    # we skip these since we want only raw data
+    if info.quantities is None:
+        return False
+
+    # we want only the first dataset from any 15-minute interval
+    # all additional datasets contain an extra timestamp in the file name
+    if info.ts_extra is not None:
+        return False
+
+    # if a radar filter was given,
+    # exclude all files coming from different radars
+    if args.radar and not info.radar.startswith(args.radar):
+        return False
+
+    # if dates were given,
+    # exclude all files outside the date range
+    if args.date_from and (info.ts < args.date_from):
+        return False
+
+    if args.date_to and (info.ts > args.date_to):
+        return False
+
+    # check age limit threshold
+    if args.age_limit_thresh and (info.ts < args.age_limit_thresh):
+        return False
+
+    return True
 
 def main(args):
+    # do some more arg parsing
+    DATE_FMT = '%Y/%m/%d'
+    args.date_from = args.date_from and datetime.datetime.strptime(args.date_from.strip('/'), DATE_FMT)
+    args.date_to   = args.date_to   and datetime.datetime.strptime(args.date_to.strip('/'), DATE_FMT)
+    args.age_limit_thresh = args.age_limit and datetime.datetime.now() - datetime.timedelta(minutes=args.age_limit)
+
+    # list the files
     files_in = []
     for fname in os.listdir(args.dirname_in):
         match = REGEX_FI.match(fname)
@@ -300,40 +335,9 @@ def main(args):
             match
         )
 
-        files_in.append(info)
-
-    # first, filter out the radar in question
-    if args.radar:
-        files_in = [
-            info
-            for info in files_in
-            if info.radar.startswith(args.radar)
-        ]
-
-    # then filter dates
-    if args.date_from or args.date_to:
-        DATE_FMT = '%Y/%m/%d'
-        date_from = args.date_from and datetime.datetime.strptime(args.date_from, DATE_FMT)
-        date_to   = args.date_to   and datetime.datetime.strptime(args.date_to, DATE_FMT)
-
-        files_in = [
-            info
-            for info in files_in
-            if
-                ((date_from is None) or (info.ts >= date_from))
-                and ((date_to is None) or (info.ts <= date_to))
-        ]
-
-    elif args.age_limit:
-        # apply generic age limit
-        # filter out files that are too old
-        thresh = datetime.datetime.now() - datetime.timedelta(minutes=args.age_limit)
-        files_in = [
-            info
-            for info in files_in
-            if info.ts >= thresh    # recent enough
-            and is_raw_data(info)
-        ]
+        # exclude files we don't want to process
+        if should_process(args, info):
+            files_in.append(info)
 
     # if anything's left, run processing
     if files_in:
@@ -342,11 +346,14 @@ def main(args):
 
         process_files(args, files_in)
 
+    else:
+        log.warn('no files left to process after filtering, quitting')
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
 
     ap.add_argument('-a', '--age-limit', type=int, metavar='MINUTES',
-        help='skip files older than MINUTES ago [%(default)s min]')
+        help='skip files older than MINUTES ago')
     ap.add_argument('--merge-files', default='merge_files', metavar='PATH',
         help='path to merge_files')
     ap.add_argument('--scans2pvol', default='Scans2Pvol.py', metavar='PATH',
@@ -364,7 +371,7 @@ if __name__ == '__main__':
     ap.add_argument('-w', dest='dirname_work', required=True, metavar='PATH',
         help='directory for intermediate files')
 
-    rn = ap.add_argument_group('optional arguments')
+    rn = ap.add_argument_group('extra filters')
     rn.add_argument('--radar', dest='radar', metavar='PREFIX',
         help='if specified, process only files with matching prefix')
     rn.add_argument('--date-from', metavar='YYYY/MM/DD',
