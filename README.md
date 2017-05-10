@@ -16,9 +16,9 @@ A set of utilities for merging data files coming from Baltrad.
 ./recurse.py INPUT OUTPUT WORKDIR --radar RADAR --date-from YYYY/MM/DD --date-to YYYY/MM/DD
 ```
 
-* INPUT: path to input directory
-* OUTPUT: path to output directory
-* WORKDIR: path to work directory, will be cleaned up after every run (unless interrupted)
+* `INPUT`: path to input directory
+* `OUTPUT`: path to output directory
+* `WORKDIR`: path to work directory, will be cleaned up after every run (unless interrupted)
 * `--radar` can be specified in multiple ways
 	* specify country, eg. `--radar fr`
     * specify radar within country, eg. `--radar frbou`
