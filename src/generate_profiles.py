@@ -298,7 +298,7 @@ def should_process(args, info):
 
     # if a radar filter was given,
     # exclude all files coming from different radars
-    if args.radar and not info.radar.startswith(args.radar):
+    if args.radar_regex and args.radar_regex.match(info.radar) is None:
         return False
 
     # if dates were given,
@@ -327,6 +327,8 @@ def main(args):
             + datetime.timedelta(hours=24)  # we will use the "strictly smaller" inequality with t+24h
                                             # in order to include the whole "--date-to" day in the interval
     args.age_limit_thresh = args.age_limit and datetime.datetime.now() - datetime.timedelta(minutes=args.age_limit)
+
+    args.radar_regex = args.radar and re.compile(args.radar)
 
     # list the files
     files_in = []
@@ -378,7 +380,7 @@ if __name__ == '__main__':
         help='directory for intermediate files')
 
     rn = ap.add_argument_group('extra filters')
-    rn.add_argument('--radar', dest='radar', metavar='PREFIX',
+    rn.add_argument('--radar', dest='radar', metavar='REGEX',
         help='if specified, process only files with matching prefix')
     rn.add_argument('--date-from', metavar='YYYY/MM/DD',
         help='skip files older than this (overrides --age-limit)')
