@@ -324,8 +324,8 @@ def main(args):
     args.date_from = args.date_from and datetime.datetime.strptime(args.date_from.strip('/'), DATE_FMT)
     args.date_to_thresh = args.date_to   and \
             datetime.datetime.strptime(args.date_to.strip('/'), DATE_FMT) \
-            + datime.timedelta(hours=24)  # we will use the "strictly smaller" inequality with t+24h
-                                          # in order to include the whole "--date-to" day in the interval
+            + datetime.timedelta(hours=24)  # we will use the "strictly smaller" inequality with t+24h
+                                            # in order to include the whole "--date-to" day in the interval
     args.age_limit_thresh = args.age_limit and datetime.datetime.now() - datetime.timedelta(minutes=args.age_limit)
 
     # list the files
