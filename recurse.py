@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 def recurse(args, dir_in, dir_out, hier_date):
     # if dates have been bounded,
     # then we need to look at the date deduced from directory hierarchy
-    if (args.date_from_ts or args_date_to_ts) and len(hier_date) == 3:
+    if (args.date_from_ts or args.date_to_ts) and len(hier_date) == 3:
         hier_ts = datetime.datetime.strptime('/'.join(hier_date), '%Y/%m/%d')
 
         if args.date_from_ts and hier_ts < args.date_from_ts:
