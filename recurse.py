@@ -36,6 +36,10 @@ def recurse(args, dir_in, dir_out, hier_date):
 
     h5_files_present = False
     for fname in os.listdir(dir_in):
+        if fname.startswith('.'):
+            # skip hidden files
+            continue
+
         fname_in = pjoin(dir_in, fname)
         if os.path.isdir(fname_in):
             recurse(args, fname_in, pjoin(dir_out, fname), hier_date + [fname])
