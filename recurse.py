@@ -9,7 +9,23 @@ from os.path import join as pjoin
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
-def recurse(args, dir_in, dir_out):
+def recurse(args, dir_in, dir_out, hier_date):
+    # if dates have been bounded,
+    # then we need to look at the date deduced from directory hierarchy
+    if (args.date_from_ts or args_date_to_ts) and len(hier_date) == 3:
+        hier_ts = datetime.datetime.strptime('/'.join(hier_date), '%Y/%m/%d')
+
+        if args.date_from_ts and hier_ts < args.date_from_ts:
+            # timestamp too low
+            return
+
+        if args.date_to_ts and hier_ts > args.date_to_ts:
+            # timestamp too high
+            # note that --date-to is meant to include the whole day
+            # which does not cause problems if we compare only dates
+            # (i.e. midnights in terms of timestamps)
+            return
+
     log.info(dir_in)
 
     try:
@@ -21,7 +37,7 @@ def recurse(args, dir_in, dir_out):
     for fname in os.listdir(dir_in):
         fname_in = pjoin(dir_in, fname)
         if os.path.isdir(fname_in):
-            recurse(args, fname_in, pjoin(dir_out, fname))
+            recurse(args, fname_in, pjoin(dir_out, fname), hier_date + [fname])
             continue
 
         if fname.endswith('.h5'):
@@ -46,7 +62,11 @@ def recurse(args, dir_in, dir_out):
     subprocess.check_call(cmd)
 
 def main(args):
-    recurse(args, args.dir_in, args.dir_out)    
+    DATE_FMT = '%Y/%m/%d'
+    args.date_from_ts = args.date_from and datetime.datetime.strptime(args.date_from.strip('/'), DATE_FMT)
+    args.date_to_ts = args.date_to and datetime.datetime.strptime(args.date_to.strip('/'), DATE_FMT)
+
+    recurse(args, args.dir_in, args.dir_out, [])    
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
@@ -56,6 +76,6 @@ if __name__ == '__main__':
 
     ap.add_argument('--date-from', metavar="YYYY/MM/DD")
     ap.add_argument('--date-to', metavar="YYYY/MM/DD")
-    ap.add_argument('--radar', metavar="CC|CCRRR", help="two- or five-letter radar code (2x country + 3x radar)")
+    ap.add_argument('--radar', metavar="CC|CCRRR|REGEX", help="two- or five-letter radar code (2x country + 3x radar)")
 
     main(ap.parse_args())
