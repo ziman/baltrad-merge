@@ -35,7 +35,7 @@ def recurse(args, dir_in, dir_out, hier_date):
         pass  # the dir probably just exists
 
     h5_files_present = False
-    for fname in os.listdir(dir_in):
+    for fname in sorted(os.listdir(dir_in)):
         if fname.startswith('.'):
             # skip hidden files
             continue
