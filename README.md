@@ -26,7 +26,7 @@ A set of utilities for merging data files coming from Baltrad.
 * `--date-from YYYY/MM/DD` will start from 00:00 of that day
 * `--date-to: YYYY/MM/DD` will stop at 24:00 of that day
 
-## Expected directory structure for `--date-from` and `--date-to`
+### Expected directory structure for `--date-from` and `--date-to`
 
 If you are specifying `--date-from` or `--date-to` (or both), the `INPUT`
 directory must contain a hierarchical directory structure in the form
