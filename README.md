@@ -25,3 +25,13 @@ A set of utilities for merging data files coming from Baltrad.
     * any combination of the above, eg. `--radar 'nl|seang|sevar|frbou|frge'` -- needs the apostrophes! (or double quotes)
 * `--date-from YYYY/MM/DD` will start from 00:00 of that day
 * `--date-to: YYYY/MM/DD` will stop at 24:00 of that day
+
+If you are specifying `--date-from` or `--date-to` (or both), the `INPUT`
+directory must contain a hierarchical directory structure in the form
+`YYYY/MM/DD`.  For example:
+
+* `INPUT/2016/09/21/01/00/bejab_.....h5` is okay
+* `INPUT/2016/09/21/myradar/bejab_.....h5` is okay
+* `INPUT/myradar/09/21/12/bejab_.....h5` is not okay
+
+In other words, the first three directories subordinate to `INPUT` will be interpreted as `YYYY/MM/DD` if (and only if) `--date-from` or `--date-to` are given.
