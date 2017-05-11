@@ -37,3 +37,4 @@ directory must contain a hierarchical directory structure in the form
 * `INPUT/myradar/09/21/12/bejab_.....h5` is not okay
 
 In other words, the first three directories subordinate to `INPUT` will be interpreted as `YYYY/MM/DD` if (and only if) `--date-from` or `--date-to` are given.
+Any further directory structure does not matter and is up to you.
