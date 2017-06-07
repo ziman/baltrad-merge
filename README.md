@@ -2,13 +2,19 @@
 
 A set of utilities for merging data files coming from Baltrad.
 
+## Principle of operation
+
+* User runs `recurse.py` from this repository.
+* Under the hood, `recurse.py` traverses the input directories and launches a
+  Docker container (sequentially) for each directory with `.h5` files to process.
+* Users are not expected to interact with the Docker container directly.
+
 ## Installation
 
 1. Install Docker: `https://docs.docker.com/engine/installation/mac/`
 2. Pull the Docker image: `docker pull ziman/baltrad-merge`
 3. Clone baltrad-merge: `https://github.com/ziman/baltrad-merge`
 4. To run, go to directory: `cd baltrad-merge`
-
 
 ## Synopsis
 
