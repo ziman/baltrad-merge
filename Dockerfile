@@ -34,6 +34,7 @@ RUN git clone https://github.com/adokter/rsl.git && cd rsl \
 
 RUN git clone https://github.com/adokter/vol2bird.git \
     && cd vol2bird \
+    && echo "change this to rebuild from this point: XYZ-1" \
     && ./configure \
         --prefix=/opt/radar/vol2bird \
         --with-rave=/opt/radar/rave \
