@@ -161,6 +161,11 @@ def merge_volumes(args, files, fname_out):
     rmtmp_linked(args, 'merge')
 
 def merge_scans_quantities(args, files, fname_out):
+    """ This function splits scans into groups by quantities,
+        then merges each group into a pvol, and finally merges
+        the pvols for each quantity into one pvol containing everything.
+    """
+
     by_quantity = collections.defaultdict(list)
     for info in files:
         by_quantity[info.quantities].append(info)
@@ -190,7 +195,13 @@ def merge_scans_quantities(args, files, fname_out):
     rmtmp_linked(args, 'merge_scans_quantities')
 
 def merge_scans(args, files, fname_out):
-    """ This function assumes that all input files have the same set of quantities. """
+    """ This function merges scans into a pvol.
+        It assumes that all input files have the same set of quantities
+        (this is not necessary for this function but the underlying script
+        Scans2pvol seems to work incorrectly with multiple quantities).
+
+        If you have different quantities, see merge_scans_quantities.
+    """
 
     dir_src, dir_dst = mktmp_linked(args, 'merge_scans', files)
 
