@@ -160,7 +160,38 @@ def merge_volumes(args, files, fname_out):
     # clean up
     rmtmp_linked(args, 'merge')
 
+def merge_scans_quantities(args, files, fname_out):
+    by_quantity = collections.defaultdict(list)
+    for info in files:
+        by_quantity[info.quantities].append(info)
+
+    # [] = do not symlink any files in dir_src
+    # we will generate them there using merge_scans
+    dir_src, dir_dst = mktmp_linked(args, 'merge_scans_quantities', [])
+
+    # first merge scans of each quantity into a pvol with that quantity
+    files_pvol = []
+    for quantities, files_quant in by_quantity.iteritems():
+        # construct the name for the newly created pvol
+        # first, the metadata determines the basename (without dirname)
+        file_pvol = files_quant[0]._replace(ftype='pvol', angle=None)
+        # pjoin with dirname
+        fname_pvol = pjoin(dir_src, make_filename(file_pvol))
+        # replace the path with the constructed path+fname
+        file_pvol = file_pvol._replace(path=fname_pvol)
+        # add to the list
+        files_pvol.append(file_pvol)
+
+        merge_scans(args, files_quant, fname_pvol)
+
+    # then, merge pvols with different quantities into a single pvol
+    merge_volumes(args, files_pvol, fname_out)
+
+    rmtmp_linked(args, 'merge_scans_quantities')
+
 def merge_scans(args, files, fname_out):
+    """ This function assumes that all input files have the same set of quantities. """
+
     dir_src, dir_dst = mktmp_linked(args, 'merge_scans', files)
 
     cwd = os.getcwd()
@@ -195,10 +226,10 @@ def merge_group(args, files, fname_out):
     if file_types == ['pvol']:
         merge_volumes(args, [info for info in files if not info.ts_extra], fname_out)
     elif file_types == ['scan']:
-        merge_scans(args, files, fname_out)
+        merge_scans_quantities(args, files, fname_out)
     elif file_types == ['pvol', 'scan']:
         # if we've got both, work from the scans
-        merge_scans(args, [i for i in files if i.ftype == 'scan'], fname_out)
+        merge_scans_quantities(args, [i for i in files if i.ftype == 'scan'], fname_out)
     else:
         raise ProgramError('unrecognised file types "%s" in %s ' % (file_types, file_names))
 
