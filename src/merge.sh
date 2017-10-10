@@ -29,7 +29,6 @@ exec /opt/radar/baltrad-merge/generate_profiles.py \
     --merge-files /opt/radar/rave/bin/merge_files \
     --scans2pvol /opt/radar/baltrad-merge/Scans2Pvol.py \
     --vol2bird /opt/radar/vol2bird/bin/vol2bird \
-    --age-limit 525600 \
     --keep-merged \
     -i "$data_in" \
     -o "$data_out" \
