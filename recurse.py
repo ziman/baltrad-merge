@@ -54,7 +54,7 @@ def recurse(args, dir_in, dir_out, hier_date):
         return
 
     # h5 files present -- run `run.sh`
-    cmd = ['./run.sh', dir_in, dir_out, args.dir_work]
+    cmd = ['./run.sh', '-c', args.container_name, dir_in, dir_out, args.dir_work]
     if args.radar:
         cmd += ['--radar', args.radar]
 
@@ -79,8 +79,10 @@ if __name__ == '__main__':
     ap.add_argument('dir_out', help="Output directory (merged files + bird profiles)")
     ap.add_argument('dir_work', help="Working directory (temporary files)")
 
-    ap.add_argument('--date-from', metavar="YYYY/MM/DD")
-    ap.add_argument('--date-to', metavar="YYYY/MM/DD")
-    ap.add_argument('--radar', metavar="CC|CCRRR|REGEX", help="two- or five-letter radar code (2x country + 3x radar)")
+    ap.add_argument('-f', '--date-from', metavar="YYYY/MM/DD")
+    ap.add_argument('-t', '--date-to', metavar="YYYY/MM/DD")
+    ap.add_argument('-r', '--radar', metavar="CC|CCRRR|REGEX", help="two- or five-letter radar code (2x country + 3x radar)")
+    ap.add_argument('-c', '--container-name', metavar='NAME', default='ziman/baltrad-merge',
+        help="docker container name to use [%(default)]")
 
     main(ap.parse_args())
