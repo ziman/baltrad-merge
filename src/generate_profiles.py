@@ -122,13 +122,13 @@ def merge_volumes(args, files, fname_out):
     for info in files:
         by_quantity[info.quantities].append(info)
 
-    # XXX TODO
-    # we (arbitrarily) select the first (= earliest by timestamp) polar volume in each group for merging
-    merge_inputs = [min(files, key=lambda f: f.ts_extra) for files in by_quantity.itervalues()]
+    # we select the first (= earliest by timestamp) polar volume in each group for merging
+    # where (ts_extra = None) is transformed to 0, the lowest value
+    merge_inputs = [min(files, key=lambda f: f.ts_extra or 0) for files in by_quantity.itervalues()]
 
     if len(merge_inputs) == 1:
         info = merge_inputs[0]
-        log.info('singleton group, just copying file: ' + info.path)
+        log.info('merge_volumes: singleton group, just copying file: ' + info.path)
         shutil.copy(info.path, fname_out)
         return
 
@@ -203,7 +203,29 @@ def merge_scans(args, files, fname_out):
         If you have different quantities, see merge_scans_quantities.
     """
 
-    dir_src, dir_dst = mktmp_linked(args, 'merge_scans', files)
+    by_angle = collections.defaultdict(list)
+    for info in files:
+        by_angle[info.angle].append(info)
+
+    # we (arbitrarily) select the first (= earliest by timestamp) polar volume in each group for merging
+    # where (ts_extra = None) is transformed to 0, the lowest value
+    merge_inputs = [min(files, key=lambda f: f.ts_extra or 0) for files in by_angle.itervalues()]
+
+    if len(merge_inputs) == 1:
+        info = merge_inputs[0]
+        log.info('merge_scans: singleton group, just copying file: ' + info.path)
+        shutil.copy(info.path, fname_out)
+        return
+
+    # check that all inputs have the same timestamp
+    timestamps = set(info.ts_extra for info in merge_inputs))
+    if len(timestamps) != 1:
+        raise Exception("irregular timestamps: %s" % timestamps)
+
+    # nonempty merge inputs
+    assert merge_inputs
+
+    dir_src, dir_dst = mktmp_linked(args, 'merge_scans', merge_inputs)
 
     cwd = os.getcwd()
     scans2pvol_abs = os.path.abspath(args.scans2pvol)
@@ -235,7 +257,7 @@ def merge_group(args, files, fname_out):
     file_types = list(sorted(set(info.ftype for info in files)))
 
     if file_types == ['pvol']:
-        merge_volumes(args, [info for info in files if not info.ts_extra], fname_out)
+        merge_volumes(args, files, fname_out)
     elif file_types == ['scan']:
         merge_scans_quantities(args, files, fname_out)
     elif file_types == ['pvol', 'scan']:
@@ -331,11 +353,6 @@ def should_process(args, info):
     # missing quantities means that the file is Baltrad-merged
     # we skip these since we want only raw data
     if info.quantities is None:
-        return False
-
-    # we want only the first dataset from any 15-minute interval
-    # all additional datasets contain an extra timestamp in the file name
-    if info.ts_extra is not None:
         return False
 
     # if a radar filter was given,
