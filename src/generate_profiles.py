@@ -218,7 +218,7 @@ def merge_scans(args, files, fname_out):
         return
 
     # check that all inputs have the same timestamp
-    timestamps = set(info.ts_extra for info in merge_inputs))
+    timestamps = set(info.ts_extra for info in merge_inputs)
     if len(timestamps) != 1:
         raise Exception("irregular timestamps: %s" % timestamps)
 
