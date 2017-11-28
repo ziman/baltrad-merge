@@ -8,5 +8,5 @@ create table files (
     angle float,
     ts text not null,
     quantities integer,
-    ts_extra float
+    ts_extra integer
 );
