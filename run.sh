@@ -5,8 +5,15 @@ realpath() {
     [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
 }
 
-if [ -z "$3" ]; then
-    echo "usage: $0 INPUT_DIR OUTPUT_DIR WORK_DIR" >&2
+container_name="ziman/baltrad-merge"
+if [ "$1" = "-c" ]; then
+    container_name="$2"
+    shift
+    shift
+fi
+
+if [ -z "$3" ] || [ -z "$2" ]; then
+    echo "usage: $0 [-c CONTAINER_NAME=ziman/baltrad-merge] INPUT_DIR OUTPUT_DIR WORK_DIR" >&2
     exit 1
 fi
 
@@ -26,7 +33,7 @@ docker run \
     -v "$dir_out":"/data/out" \
     -v "$dir_work":"/data/work" \
     -v "$dir_etc":"/data/etc" \
-    ziman/baltrad-merge \
+    "$container_name" \
     /opt/radar/baltrad-merge/merge.sh \
         '/data/in' '/data/out' '/data/work' \
         "$@"
