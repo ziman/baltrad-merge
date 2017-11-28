@@ -1,23 +1,30 @@
 #!/usr/bin/env python3
 
 import os
+import h5py
 import argparse
 import sqlite3
 import logging
 from os.path import join as pjoin
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 def main_add(args, db):
+    def process_file(root, fname):
+        log.debug(fname)
+        with h5py.File(fname, 'r') as f:
+            print(f)
+
     def process_files(root, files):
-        values = []
         db.executemany('''
             insert into files (path, country, radar, ftype, angle, ts, quantities, ts_extra)
             values (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', values)
+        ''', [process_file(root, fname) for fname in files])
 
     def browse(root, dname):
+        log.debug(dname)
+
         with os.scandir(dname) as it:
             dirs = []
             files = []
@@ -25,10 +32,12 @@ def main_add(args, db):
             for entry in it:
                 if entry.is_dir():
                     dirs.append(entry.path)
-                else:
+                elif entry.path.endswith('.h5'):
                     files.append(entry.path)
 
-            process_files(root, files)
+            if files:
+                log.info('%s: %d files' % (dname, len(files)))
+                process_files(root, files)
 
             for dname in dirs:
                 browse(root, dname)
