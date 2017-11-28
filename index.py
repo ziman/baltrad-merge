@@ -14,6 +14,7 @@ def main_add(args, db):
     def process_file(root, fname):
         log.debug(fname)
         with h5py.File(fname, 'r') as f:
+            # TODO: h5 file parsing + SQL data model
             print(f)
 
     def process_files(root, files):
