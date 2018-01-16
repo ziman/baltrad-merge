@@ -13,7 +13,7 @@ CREATE TABLE files (
 );
 CREATE TABLE sources (
 	id INTEGER PRIMARY KEY,
-	root_abs TEXT,
+	name TEXT,
 	ts DATETIME
 );
 CREATE INDEX idx_files_ts ON files(ts);

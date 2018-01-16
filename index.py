@@ -56,8 +56,8 @@ def add_path(args, db, root_dir_abs):
                     ))
 
     c = db.cursor()
-    c.execute("INSERT INTO sources (root_abs, ts) VALUES (?, ?)", (
-        root_dir_abs,
+    c.execute("INSERT INTO sources (name, ts) VALUES (?, ?)", (
+        args.name or root_dir_abs,
         datetime.datetime.now(),
     ))
     source_id = c.lastrowid
@@ -73,4 +73,5 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('dbfile', metavar='db.sqlite3', help='Database file')
     ap.add_argument('-a', dest='add_path', default=None, metavar='DIRECTORY', help='Add directory')
+    ap.add_argument('-n', dest='name', default=None, metavar='DATASET_NAME', help='Name of the dataset')
     main(ap.parse_args())
