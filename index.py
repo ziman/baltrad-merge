@@ -35,19 +35,30 @@ def add_path(args, db, root_dir_abs):
         log.info(path_abs)
         with os.scandir(path_abs) as entries:
             for entry in entries:
-                if entry.is_dir():
-                    add_directory(
-                        source_id,
-                        os.path.join(path_abs, entry.name),
-                        os.path.join(path_rel, entry.name),
-                    )
-                else:
-                    info = parse_filename(entry.name)
-                    if info is None:
-                        log.debug('skipping: %s', entry.name)
-                        continue
+                files = []
+                directories = []
+                tuples = []
 
-                    db.execute("""
+                if entry.is_dir():
+                    directories.append(entry.name)
+                else:
+                    files.append(entry.name)
+
+                if files:
+                    for fname in files:
+                        info = parse_filename(fname)
+                        if info is None:
+                            log.debug('skipping: %s', entry.name)
+                            continue
+
+                        tuples.append((
+                            path_rel, fname,
+                            info.radar, info.ftype, info.angle, info.ts,
+                            info.quantities, info.ts_extra,
+                            source_id
+                        ))
+
+                    db.executemany("""
                         INSERT INTO files (
                             dir_rel, name, 
                             radar, ftype, angle, ts, quantities, ts_extra,
@@ -56,11 +67,16 @@ def add_path(args, db, root_dir_abs):
                         VALUES (?, ?,
                             ?, ?, ?, ?, ?, ?,
                             ?)
-                    """, (path_rel, entry.name,
-                        info.radar, info.ftype, info.angle, info.ts,
-                        info.quantities, info.ts_extra,
-                        source_id
-                    ))
+                        """,
+                        tuples
+                    )
+
+                for dname in directories:
+                    add_directory(
+                        source_id,
+                        os.path.join(path_abs, dname),
+                        os.path.join(path_rel, dname),
+                    )
 
     c = db.cursor()
     c.execute("INSERT INTO sources (name, ts) VALUES (?, ?)", (
