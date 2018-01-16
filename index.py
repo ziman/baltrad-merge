@@ -28,12 +28,13 @@ def parse_filename(basename):
     )
 
 def add_path(args, db, root_dir_abs):
-    def add_directory(path_abs, path_rel):
+    def add_directory(source_id, path_abs, path_rel):
         log.info(path_abs)
         with os.scandir(path_abs) as entries:
             for entry in entries:
                 if entry.is_dir():
                     add_directory(
+                        source_id,
                         os.path.join(path_abs, entry.name),
                         os.path.join(path_rel, entry.name),
                     )
@@ -42,16 +43,26 @@ def add_path(args, db, root_dir_abs):
                     db.execute("""
                         INSERT INTO files (
                             dir_rel, name, 
-                            radar, ftype, angle, ts, quantities, ts_extra
+                            radar, ftype, angle, ts, quantities, ts_extra,
+                            source_id
                         )
                         VALUES (?, ?,
-                            ?, ?, ?, ?, ?, ?)
+                            ?, ?, ?, ?, ?, ?,
+                            ?)
                     """, (path_rel, entry.name,
                         info.radar, info.ftype, info.angle, info.ts,
-                        info.quantities, info.ts_extra
+                        info.quantities, info.ts_extra,
+                        source_id
                     ))
 
-    add_directory(root_dir_abs, '')
+    c = db.cursor()
+    c.execute("INSERT INTO sources (root_abs, ts) VALUES (?, ?)", (
+        root_dir_abs,
+        datetime.datetime.now(),
+    ))
+    source_id = c.lastrowid
+
+    add_directory(source_id, root_dir_abs, '')
 
 def main(args):
     with sqlite3.connect(args.dbfile) as db:
