@@ -16,6 +16,9 @@ REGEX_FI = re.compile(r'(.....)_(scan|pvol)(?:_(-?[0-9.]+))?_(\d{8}T\d{4}Z)(?:_(
 
 def parse_filename(basename):
     match = REGEX_FI.match(basename)
+    if not match:
+        return None
+
     return FileInfo(
         radar=match.group(1),
         ftype=match.group(2),
@@ -40,6 +43,10 @@ def add_path(args, db, root_dir_abs):
                     )
                 else:
                     info = parse_filename(entry.name)
+                    if info is None:
+                        log.debug('skipping: %s', entry.name)
+                        continue
+
                     db.execute("""
                         INSERT INTO files (
                             dir_rel, name, 
